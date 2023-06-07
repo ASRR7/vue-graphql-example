@@ -1,27 +1,42 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+<h1>Comments</h1>
+<ul>
+  <li v-for="comment, index in comments" :key="index">
+    {{ comment.text }}
+  </li>
+</ul>
 </template>
 
-<script lang="ts">
+<script lang='ts'>
 import { defineComponent } from 'vue';
-import HelloWorld from './components/HelloWorld.vue';
+import gql from 'graphql-tag';
 
 export default defineComponent({
-  name: 'App',
-  components: {
-    HelloWorld
+  data(){
+    return {
+      comments : []
+    }
+  },
+  apollo : {
+    $subscribe : {
+      comments : {
+        query: gql`
+        subscription {
+          comments: commentCreated {
+            name, 
+            text
+          }
+        }
+        `,
+        result({data}){
+          this.comments = data.commentCreated
+        }
+      }
+    }
   }
-});
+})
 </script>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+<style scoped>
+
 </style>
